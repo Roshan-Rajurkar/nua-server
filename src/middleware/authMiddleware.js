@@ -1,6 +1,7 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 export const getUserId = (req, res, next) => {
+  console.log("Came for verification");
   const authHeader = req.header("Authorization");
   if (!authHeader) return res.status(401).json({ error: "Unauthorized" });
 

@@ -1,14 +1,15 @@
-const express = require("express");
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-const { getUserId } = require("../middleware/authMiddleware.js");
-const {
+import express from "express";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import { getUserId } from "../middleware/authMiddleware.js";
+import {
   downloadFile,
   getFiles,
   shareFile,
   uploadFiles,
-} = require("../controllers/file.controller.js");
+} from "../controllers/file.controller.js";
 
 const fileRoutes = express.Router();
 

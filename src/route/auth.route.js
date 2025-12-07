@@ -1,10 +1,10 @@
-const express = require("express");
-const {
+import express from "express";
+import {
   getAllUsers,
   login,
   register,
-} = require("../controllers/auth.controller.js");
-const { getUserId } = require("../middleware/authMiddleware.js");
+} from "../controllers/auth.controller.js";
+import { getUserId } from "../middleware/authMiddleware.js";
 
 const authRoutes = express.Router();
 
