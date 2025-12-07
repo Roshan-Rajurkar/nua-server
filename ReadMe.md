@@ -12,3 +12,4 @@ MONGO_URI=your_mongo_url
 <!-- start application -->
 
 npm install
+npm start
