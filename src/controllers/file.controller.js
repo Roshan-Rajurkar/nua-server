@@ -1,20 +1,17 @@
-import path from "path";
-import fs from "fs";
-import { File } from "../model/file.model.js";
-import { fileURLToPath } from "url";
+const path = require("path");
+const fs = require("fs");
+const { File } = require("../model/file.model.js");
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.resolve();
 
-export const uploadFiles = async (req, res) => {
+const uploadFiles = async (req, res) => {
   try {
     const files = req.files;
-    console.log("Called for files: ", files);
     if (!files || files.length === 0)
       return res.status(400).json({ error: "No files uploaded" });
 
     const fileDocs = await Promise.all(
-      files?.map((file) =>
+      files.map((file) =>
         File.create({
           filename: file.filename,
           path: file.path,
@@ -33,7 +30,7 @@ export const uploadFiles = async (req, res) => {
   }
 };
 
-export const getFiles = async (req, res) => {
+const getFiles = async (req, res) => {
   try {
     const files = await File.find({
       $or: [{ ownerId: req.userId }, { sharedWith: req.userId }],
@@ -45,17 +42,20 @@ export const getFiles = async (req, res) => {
   }
 };
 
-export const downloadFile = async (req, res) => {
+const downloadFile = async (req, res) => {
   try {
     const file = await File.findById(req.params.id);
 
     if (!file) return res.status(404).json({ error: "File not found" });
 
-    if (file.ownerId !== req.userId && !file.sharedWith.includes(req.userId)) {
+    if (
+      file.ownerId.toString() !== req.userId.toString() &&
+      !file.sharedWith.map(String).includes(req.userId.toString())
+    ) {
       return res.status(403).json({ error: "Access denied" });
     }
 
-    const filePath = path.join(__dirname, "../uploads", file.filename);
+    const filePath = path.join(__dirname, "uploads", file.filename);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: "File missing on server" });
@@ -67,7 +67,7 @@ export const downloadFile = async (req, res) => {
   }
 };
 
-export const shareFile = async (req, res) => {
+const shareFile = async (req, res) => {
   try {
     const { id } = req.params;
     const { userIds } = req.body;
@@ -95,10 +95,15 @@ export const shareFile = async (req, res) => {
 
     await file.save();
 
-    res.json({
-      success: true,
-    });
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+module.exports = {
+  uploadFiles,
+  getFiles,
+  downloadFile,
+  shareFile,
 };
